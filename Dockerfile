@@ -15,6 +15,7 @@ FROM deps AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # ENV DATABASE_URL="postgresql://quran:quran@db:5432/quran?schema=public"
+ENV DATABASE_URL="postgresql://quran:quran@localhost:5432/quran?schema=public"
 RUN npm run build
 
 FROM base AS runner
