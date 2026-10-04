@@ -30,7 +30,7 @@ COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build /app/next.config.mjs ./next.config.mjs
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x docker-entrypoint.sh && mkdir -p /data
-VOLUME ["/data"]
+# VOLUME ["/data"]
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s \
   CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
