@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-
+# comment
 FROM base AS deps
 COPY package.json package-lock.json* ./
 RUN npm install
