@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectStatus {
+  DRAFT
+  OVERLAYS_READY
+  VIDEO_READY
+  RENDERED
+}
+
+enum RenderStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model Project {
+  id         String        @id @default(cuid())
+  name       String
+  status     ProjectStatus @default(DRAFT)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  segments   Segment[]
+  video      VideoAsset?
+  renderJobs RenderJob[]
+
+  @@index([createdAt])
+}
+
+model Segment {
+  id                 String    @id @default(cuid())
+  projectId          String
+  project            Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  position           Int
+  ayah               Int
+  segment            Int
+  arabic             String
+  translation        String
+  wordCount          Int
+  startTime          Float?
+  endTime            Float?
+  overlayPath        String?
+  overlayGeneratedAt DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@unique([projectId, ayah, segment])
+  @@index([projectId, position])
+}
+
+model VideoAsset {
+  id           String   @id @default(cuid())
+  projectId    String   @unique
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  originalName String
+  path         String
+  sizeBytes    Int
+  durationSec  Float
+  width        Int
+  height       Int
+  fps          Float
+  hasAudio     Boolean
+  videoCodec   String?
+  createdAt    DateTime @default(now())
+}
+
+model RenderJob {
+  id         String       @id @default(cuid())
+  projectId  String
+  project    Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status     RenderStatus @default(QUEUED)
+  progress   Float        @default(0)
+  outputPath String?
+  error      String?
+  createdAt  DateTime     @default(now())
+  startedAt  DateTime?
+  finishedAt DateTime?
+
+  @@index([projectId, createdAt])
+}
